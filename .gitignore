@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyTorch checkpoints and large binaries
+*.pt
+*.pth
+*.onnx
+models_storage/*.pt
+models_storage/*.pth
+!models_storage/sample_pi_lstm_checkpoint.pt
+
+# Large Raw Datasets (Keep raw CEDA CAMELS-GB archives out of Git)
+data/raw/
+data/CAMELS_GB/
+*.zip
+*.tar.gz
+*.tar
+
+# Environment & IDE
+.env
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Test & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
