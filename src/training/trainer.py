@@ -39,6 +39,8 @@ def run_experiment_task(
     meta = loader.get_catchment_metadata(gauge_id)
     area = float(meta.get("area", 100.0))
 
+    from src.evaluation.benchmark import BenchmarkRunner
+
     runner = BenchmarkRunner(
         lookback_window=lookback,
         forecast_horizon=1,
