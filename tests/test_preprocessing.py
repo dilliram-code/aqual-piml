@@ -106,5 +106,5 @@ def test_dataset_sliding_windows(sample_timeseries_df):
 
     item = train_ds[0]
     assert item["x"].shape == (lookback, 3)
-    assert item["y"].ndim == 0 or item["y"].shape == ()
+    assert item["y"].shape == (horizon,) or item["y"].ndim == 0
     assert item["p_unscaled"].shape == (lookback,)
