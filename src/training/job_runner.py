@@ -156,7 +156,7 @@ class JobManager:
 
         except Exception as e:
             job.status = "failed"
-            job.completed_at = datetime.utcnow().isoformat()
+            job.completed_at = datetime.now(timezone.utc).isoformat()
             job.error = str(e)
             job.status_message = f"Training failed: {str(e)}"
             traceback.print_exc()
