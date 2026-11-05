@@ -10,7 +10,11 @@ Generates real experimental evaluation results across:
 
 import json
 from pathlib import Path
+import sys
 import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from src.data.camels_loader import CamelsGBLoader
 from src.evaluation.benchmark import BenchmarkRunner
 from src.training.trainer import run_experiment_task
