@@ -81,16 +81,25 @@ class PhysicsInformedLoss(nn.Module):
         diagnostics : Dict[str, float]
             Individual loss components and physical metrics
         """
+        # Ensure matching 1D tensor shapes
+        q_pred_s = q_pred_scaled.view(-1)
+        q_true_s = q_true_scaled.view(-1)
+        p = p_unscaled.view(-1)
+        pet = pet_unscaled.view(-1)
+        et = et_pred_unscaled.view(-1)
+        q_phys = q_pred_unscaled.view(-1)
+        ds = delta_s_unscaled.view(-1)
+
         # 1. Prediction Loss (Normalized Space)
-        l_pred = self.mse(q_pred_scaled, q_true_scaled)
+        l_pred = self.mse(q_pred_s, q_true_s)
 
         # 2. Physics Mass Conservation Loss (Physical Space: mm/day)
         # Residual R = P - ET - Q - Delta S
-        residual = p_unscaled - et_pred_unscaled - q_pred_unscaled - delta_s_unscaled
+        residual = p - et - q_phys - ds
         l_wb = torch.mean(residual ** 2)
 
         # Optional soft barrier penalty if ET ever slightly exceeded PET (safety guard)
-        et_excess = F.relu(et_pred_unscaled - pet_unscaled)
+        et_excess = F.relu(et - pet)
         l_et_bound = torch.mean(et_excess ** 2)
 
         # 3. Composite Total Loss
@@ -102,8 +111,8 @@ class PhysicsInformedLoss(nn.Module):
             "loss_prediction": float(l_pred.detach().item()),
             "loss_water_balance": float(l_wb.detach().item()),
             "mean_abs_residual_mm": float(torch.mean(torch.abs(residual)).detach().item()),
-            "mean_et_pred_mm": float(torch.mean(et_pred_unscaled).detach().item()),
-            "mean_q_pred_mm": float(torch.mean(q_pred_unscaled).detach().item()),
+            "mean_et_pred_mm": float(torch.mean(et).detach().item()),
+            "mean_q_pred_mm": float(torch.mean(q_phys).detach().item()),
             "lambda_physics": self.lambda_physics,
         }
 
