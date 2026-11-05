@@ -134,8 +134,8 @@ class ConventionalLSTMPredictor(BaseHydrologicalModel):
                 y = batch["y"].to(self.device)
 
                 optimizer.zero_grad()
-                pred = self.network(x).squeeze(-1)
-                loss = criterion(pred, y)
+                pred = self.network(x).view(-1)
+                loss = criterion(pred, y.view(-1))
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.network.parameters(), max_norm=1.0)
                 optimizer.step()
@@ -153,8 +153,8 @@ class ConventionalLSTMPredictor(BaseHydrologicalModel):
                     for batch in val_loader:
                         x = batch["x"].to(self.device)
                         y = batch["y"].to(self.device)
-                        pred = self.network(x).squeeze(-1)
-                        v_loss = criterion(pred, y)
+                        pred = self.network(x).view(-1)
+                        v_loss = criterion(pred, y.view(-1))
                         val_batch_losses.append(v_loss.item())
                 epoch_val_loss = float(np.mean(val_batch_losses))
                 history["val_loss"].append(epoch_val_loss)
