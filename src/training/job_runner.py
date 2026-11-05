@@ -99,7 +99,7 @@ class JobManager:
 
     def submit_job(self, config: Dict[str, Any], task_fn: Callable) -> str:
         """Create and submit a training job to the background thread pool."""
-        job_id = f"exp_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
+        job_id = f"exp_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
         job = TrainingJob(job_id=job_id, config=config)
         self.jobs[job_id] = job
 
@@ -108,7 +108,7 @@ class JobManager:
 
     def _run_job_wrapper(self, job: TrainingJob, task_fn: Callable):
         job.status = "running"
-        job.started_at = datetime.utcnow().isoformat()
+        job.started_at = datetime.now(timezone.utc).isoformat()
         job.status_message = "Training started in background..."
 
         def progress_cb(current_ep, total_ep, train_loss, val_loss):
@@ -128,7 +128,7 @@ class JobManager:
             results = task_fn(job.config, progress_cb)
             job.status = "completed"
             job.progress_pct = 100
-            job.completed_at = datetime.utcnow().isoformat()
+            job.completed_at = datetime.now(timezone.utc).isoformat()
             job.status_message = "Experiment completed successfully."
             job.results = results
 
