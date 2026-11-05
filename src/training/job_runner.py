@@ -10,7 +10,7 @@ stores experiment metadata, and saves results to disk.
 """
 
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from pathlib import Path
 import threading
@@ -34,7 +34,7 @@ class TrainingJob:
         self.current_train_loss: Optional[float] = None
         self.current_val_loss: Optional[float] = None
         self.status_message: str = "Job initialized in queue."
-        self.created_at: str = datetime.utcnow().isoformat()
+        self.created_at: str = datetime.now(timezone.utc).isoformat()
         self.started_at: Optional[str] = None
         self.completed_at: Optional[str] = None
         self.error: Optional[str] = None
