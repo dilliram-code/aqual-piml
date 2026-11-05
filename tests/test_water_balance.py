@@ -91,3 +91,4 @@ def test_cumulative_mass_balance():
     storage_change = s[-1] - 50.0
 
     assert np.isclose(storage_change, total_in - total_out)
+

@@ -268,3 +268,4 @@ def generate_benchmark_camels_gb_sample(
 
         filename = f"CAMELS_GB_hydromet_timeseries_{cid}_19701001-20150930.csv"
         ts_df.to_csv(output_dir / filename, index=False)
+

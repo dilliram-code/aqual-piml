@@ -263,3 +263,4 @@ class BenchmarkRunner:
             progress_callback("Benchmark complete!", 100)
 
         return results
+

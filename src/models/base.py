@@ -58,3 +58,4 @@ class BaseHydrologicalModel(ABC):
             "is_trained": self.is_trained,
             "config": self.config,
         }
+

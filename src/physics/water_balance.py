@@ -196,3 +196,4 @@ class CatchmentWaterBalance:
         et_budyko = np.minimum(et_budyko, pet)
         et_budyko = np.maximum(et_budyko, 0.0)
         return et_budyko
+

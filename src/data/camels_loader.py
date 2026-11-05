@@ -262,3 +262,4 @@ class CamelsGBLoader:
             "gauge_lon": -1.5,
             "regime": "Temperate Maritime",
         }
+

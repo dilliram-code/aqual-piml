@@ -71,3 +71,4 @@ def test_picp_and_mpiw():
     assert np.isclose(picp, 75.0)
     # widths: [2, 4, 2, 4] -> mean = 3.0
     assert np.isclose(mpiw, 3.0)
+

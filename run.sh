@@ -40,3 +40,4 @@ echo "Press Ctrl+C to terminate."
 echo "----------------------------------------------------------------------"
 
 exec $PYTHON_CMD -m uvicorn backend.main:app --host "${HOST}" --port "${PORT}"
+

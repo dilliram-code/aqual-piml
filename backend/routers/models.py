@@ -131,3 +131,4 @@ def get_model_comparison(gauge_id: str):
         "models": res["models"],
         "metadata": res["metadata"],
     }
+

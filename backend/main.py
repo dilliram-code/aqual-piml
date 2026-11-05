@@ -103,3 +103,4 @@ app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="fronte
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.main:app", host=settings.host, port=settings.port, reload=True)
+

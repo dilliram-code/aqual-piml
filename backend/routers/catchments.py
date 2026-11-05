@@ -82,3 +82,4 @@ def get_catchment_detail(gauge_id: str):
         date_range=date_range,
         quality_flag_distribution=quality_counts,
     )
+

@@ -115,3 +115,4 @@ def get_cross_correlations(gauge_id: str):
         "precipitation_discharge_correlations": corrs,
         "optimal_lag_days": int(np.argmax(corrs)),
     }
+

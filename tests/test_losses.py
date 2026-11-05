@@ -81,3 +81,4 @@ def test_loss_gradient_flow():
     assert np.isclose(float(q_phys.grad.item()), -5.0)
     assert et.grad is not None
     assert np.isclose(float(et.grad.item()), -5.0)
+

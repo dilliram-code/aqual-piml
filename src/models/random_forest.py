@@ -173,3 +173,4 @@ class RandomForestHydrologyModel(BaseHydrologicalModel):
         self.lag_feature_names = state["lag_feature_names"]
         self.config = state["config"]
         self.is_trained = state["is_trained"]
+

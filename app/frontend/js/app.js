@@ -555,3 +555,4 @@ const App = {
 
 // Initialize on DOM load
 window.addEventListener('DOMContentLoaded', () => App.init());
+

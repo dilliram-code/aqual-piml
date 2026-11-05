@@ -417,3 +417,4 @@ class PhysicsInformedLSTMPredictor(BaseHydrologicalModel):
         if checkpoint.get("scaler"):
             self.scaler = HydrologicalScaler.from_dict(checkpoint["scaler"])
         self.is_trained = checkpoint.get("is_trained", True)
+

@@ -120,3 +120,4 @@ def get_catchment_water_balance(gauge_id: str):
         "mean_abs_residual_mm": round(float(np.mean(np.abs(residual))), 4),
         "total_mass_balance_closure_mm": round(float(cum_in[-1] - cum_out[-1] - (storage[-1] - storage[0])), 2),
     }
+

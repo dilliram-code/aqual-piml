@@ -59,3 +59,4 @@ def test_negative_discharge_raises():
 
     with pytest.raises(ValueError, match="cannot be physically negative"):
         runoff_mm_day_to_m3s(np.array([1.0, -0.5, 3.0]), catchment_area_km2=100.0)
+

@@ -443,3 +443,4 @@ const Charts = {
     Plotly.newPlot(el, traces, layout, this.defaultConfig);
   },
 };
+

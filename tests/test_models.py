@@ -49,3 +49,4 @@ def test_pi_lstm_flux_bounds():
     assert torch.all(outputs["et_fraction"] <= 1.0)
     assert torch.all(outputs["storage_state"] >= 0.0)
     assert torch.all(outputs["et_physical"] <= pet + 1e-6)
+
