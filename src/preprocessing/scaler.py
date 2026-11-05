@@ -55,15 +55,29 @@ class HydrologicalScaler:
         self.is_fitted = True
         return self
 
-    def transform(self, df: pd.DataFrame) -> np.ndarray:
+    def transform(
+        self,
+        df: pd.DataFrame,
+        columns: Optional[List[str]] = None,
+    ) -> np.ndarray:
         """
         Transform data into scaled matrix using fitted statistics.
+        If columns is provided, transform those columns; otherwise transform columns
+        present in df that have fitted statistics.
         """
         if not self.is_fitted:
             raise RuntimeError("HydrologicalScaler must be fitted before transform.")
 
-        out = np.zeros((len(df), len(self.feature_names)), dtype=np.float32)
-        for i, col in enumerate(self.feature_names):
+        if columns is not None:
+            target_cols = [c for c in columns if c in self.stats]
+        else:
+            target_cols = [c for c in df.columns if c in self.stats]
+
+        if not target_cols:
+            raise ValueError(f"No valid fitted columns found to transform. Available in scaler: {list(self.stats.keys())}")
+
+        out = np.zeros((len(df), len(target_cols)), dtype=np.float32)
+        for i, col in enumerate(target_cols):
             vals = df[col].values.astype(np.float64)
             stat = self.stats[col]
             if self.method == "standard":
