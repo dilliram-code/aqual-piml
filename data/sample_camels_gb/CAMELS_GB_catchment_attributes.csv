@@ -1,0 +1,7 @@
+gauge_id,gauge_name,river,gauge_lat,gauge_lon,area,elev_mean,dpsbar,bfi_host,regime,mean_annual_p,mean_temp,soil_storage_cap,recession_k
+54057,Severn at Plynlimon flume,Severn,52.473,-3.743,8.7,482.0,128.5,0.21,Upland Flashy Rainfed,2400.0,7.5,85.0,0.35
+39001,Thames at Kingston,Thames,51.415,-0.309,9948.0,108.0,34.2,0.65,Lowland Permeable Chalk,720.0,10.4,250.0,0.05
+28009,Trent at Colwick,Trent,52.951,-1.109,7486.0,142.0,45.1,0.52,Mixed Lowland Agricultural,790.0,9.8,180.0,0.09
+15006,Tay at Ballathie,Tay,56.518,-3.393,4587.0,435.0,112.0,0.48,Highland Mountain & Loch,1650.0,7.8,140.0,0.12
+42004,Avon at Knapp Mill,Hampshire Avon,50.749,-1.777,1706.0,96.0,28.5,0.84,Groundwater Dominated Chalk,810.0,10.2,310.0,0.03
+71001,Ribble at Samlesbury,Ribble,53.766,-2.613,1145.0,248.0,88.0,0.38,Pennine Upland Responsive,1380.0,8.9,115.0,0.22
