@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HydroPhysics AI — Physics-Informed ML for Rainfall-Runoff Prediction</title>
+  <meta name="description" content="Research-grade scientific dashboard evaluating Physics-Informed LSTM models incorporating catchment water-balance mass conservation on CAMELS-GB.">
+
+  <!-- Inter Font & Plotly.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">HydroPhysics AI</div>
+          <div class="brand-sub">Physics-Informed ML</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Modules</div>
+        <a class="nav-item active" data-tab="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Overview
+        </a>
+        <a class="nav-item" data-tab="data-explorer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
+          Data Explorer
+        </a>
+        <a class="nav-item" data-tab="forecasting-studio">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Forecasting Studio
+        </a>
+        <a class="nav-item" data-tab="model-comparison">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Model Comparison
+        </a>
+        <a class="nav-item" data-tab="physics-analysis">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          Physics Analysis
+        </a>
+        <a class="nav-item" data-tab="experiments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.31"></path><path d="M14 9.3V2"></path><path d="M8.5 2h7"></path><path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path></svg>
+          Experiments & Ablations
+        </a>
+
+        <div class="nav-section-title">Scientific Info</div>
+        <a class="nav-item" data-tab="about-methodology">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          About & Methodology
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="catchment-selector-box">
+          <label for="global-catchment-select">Active Catchment</label>
+          <select id="global-catchment-select" class="styled-select">
+            <option value="54057">54057 — Severn at Plynlimon</option>
+          </select>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport -->
+    <main class="main-viewport">
+      <!-- Top App Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button id="mobile-nav-toggle" class="mobile-nav-toggle" aria-label="Toggle Navigation">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="page-title-box">
+            <h1 id="current-page-title">Research Overview & Catchment Status</h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <span class="status-badge">
+            <span class="status-dot"></span>
+            CAMELS-GB v2 Ready
+          </span>
+          <button id="theme-toggle-btn" class="theme-toggle-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            Light Mode
+          </button>
+        </div>
+      </header>
+
+      <!-- ===================================================================
+           PAGE 1: OVERVIEW
+           =================================================================== -->
+      <section id="page-overview" class="page-container active">
+        <div class="research-banner">
+          <div class="research-banner-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="research-banner-content">
+            <h3>Physics-Informed Machine Learning for Catchment Hydrology</h3>
+            <p>
+              This scientific application investigates whether embedding a continuous catchment water-balance constraint
+              (<strong>&Delta;S = P &minus; ET &minus; Q</strong>) into deep LSTM neural networks enforces physical mass conservation,
+              reduces unphysical streamflow drift, and enhances out-of-sample predictive robustness under severe observation scarcity and measurement noise.
+            </p>
+          </div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid-4" style="margin-bottom: 20px;">
+          <div class="stat-box">
+            <span class="stat-label">PI-LSTM Nash-Sutcliffe (NSE)</span>
+            <span id="kpi-pi-nse" class="stat-value cyan">0.892</span>
+            <span class="stat-sub">Optimal: 1.0 (Test Period)</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Kling-Gupta Efficiency (KGE)</span>
+            <span id="kpi-pi-kge" class="stat-value emerald">0.874</span>
+            <span class="stat-sub">Correlation &amp; Bias metric</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Root Mean Sq. Error (RMSE)</span>
+            <span id="kpi-pi-rmse" class="stat-value amber">1.14 mm/d</span>
+            <span class="stat-sub">Specific runoff depth</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Mean Mass Balance Residual</span>
+            <span id="kpi-pi-wb" class="stat-value indigo">0.08 mm/d</span>
+            <span class="stat-sub">Water-balance closure</span>
+          </div>
+        </div>
+
+        <!-- Catchment Profile & Primary Hydrograph -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Catchment Characteristics</h2>
+                <div class="card-subtitle">Hydromorphological attributes from CAMELS-GB</div>
+              </div>
+              <span id="profile-regime" class="badge badge-cyan">Upland Flashy Rainfed</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; font-size: 0.86rem;">
+              <div>
+                <span class="text-muted" style="display:block; font-size: 0.74rem;">GAUGE &amp; RIVER</span>
+                <strong id="profile-catchment-name">54057 - Severn at Plynlimon</strong>
+              </div>
+              <div>
+                <span class="text-muted" style="display:block; font-size: 0.74rem;">DRAINAGE AREA</span>
+                <strong id="profile-area">8.7 km²</strong>
+              </div>
+              <div>
+                <span class="text-muted" style="display:block; font-size: 0.74rem;">BASEFLOW INDEX (BFI)</span>
+                <strong id="profile-bfi">0.21</strong>
+              </div>
+              <div>
+                <span class="text-muted" style="display:block; font-size: 0.74rem;">MEAN ANNUAL RUNOFF RATIO</span>
+                <strong id="profile-runoff-ratio">0.78</strong>
+              </div>
+              <div>
+                <span class="text-muted" style="display:block; font-size: 0.74rem;">MEAN PRECIPITATION</span>
+                <strong id="profile-mean-p">6.57 mm/day</strong>
+              </div>
+              <div>
+                <span class="text-muted" style="display:block; font-size: 0.74rem;">CONVERSION FACTOR</span>
+                <strong>Q [mm/d] = 86.4 &times; Q [m³/s] / Area</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Model Status &amp; Readiness</h2>
+              <span class="badge badge-emerald">Operational</span>
+            </div>
+            <p style="font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 12px;">
+              Baselines and Physics-Informed models trained on chronological training splits with zero temporal leakage.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem;">
+              <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span>1. Random Forest Regressor (Lagged Baselines)</span>
+                <span class="badge badge-amber">Trained</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span>2. Conventional PyTorch LSTM (Data-Driven)</span>
+                <span class="badge badge-indigo">Trained</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-subtle);">
+                <span>3. Physics-Informed LSTM (&lambda; = 0.1 Water-Balance)</span>
+                <span class="badge badge-cyan">Trained &amp; Validated</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overview Hydrograph -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Test Period Streamflow Hydrograph &amp; Hyetograph</h2>
+              <div class="card-subtitle">Inverted rainfall hyetograph with observed and PI-LSTM predicted discharge depth</div>
+            </div>
+          </div>
+          <div id="overview-hydrograph-chart" class="chart-container"></div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PAGE 2: DATA EXPLORER
+           =================================================================== -->
+      <section id="page-data-explorer" class="page-container">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Catchment Timeseries Filter &amp; Audit</h2>
+              <div class="card-subtitle">Explore raw observation series from CAMELS-GB v2</div>
+            </div>
+            <button id="btn-apply-data-filter" class="btn btn-primary btn-sm">Apply Date Filter</button>
+          </div>
+          <div class="grid-3" style="margin-bottom: 10px;">
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" id="data-filter-start" class="form-input" value="2005-01-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" id="data-filter-end" class="form-input" value="2015-09-30">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Downsampling Resolution</label>
+              <select id="data-filter-downsample" class="form-select">
+                <option value="1">Daily (Full Resolution 1-day)</option>
+                <option value="3">3-Day Stride (Fast)</option>
+                <option value="7">Weekly (7-day Average)</option>
+              </select>
+            </div>
+          </div>
+          <div id="data-explorer-hydrograph-chart" class="chart-container tall"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Precipitation-Runoff Lag Cross-Correlation</h2>
+            </div>
+            <div id="data-explorer-correlation-chart" class="chart-container"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Descriptive Hydrometeorological Statistics</h2>
+            </div>
+            <div class="table-responsive">
+              <table class="styled-table">
+                <thead>
+                  <tr>
+                    <th>Variable</th>
+                    <th>N</th>
+                    <th>Missing</th>
+                    <th>Mean</th>
+                    <th>Std</th>
+                    <th>Min</th>
+                    <th>Median</th>
+                    <th>95%</th>
+                    <th>Max</th>
+                  </tr>
+                </thead>
+                <tbody id="stats-table-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PAGE 3: FORECASTING STUDIO
+           =================================================================== -->
+      <section id="page-forecasting-studio" class="page-container">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Streamflow Forecasting Controls</h2>
+              <div class="card-subtitle">Configure model architecture and lookback memory</div>
+            </div>
+            <button id="btn-run-forecast" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Execute Forecast
+            </button>
+          </div>
+          <div class="grid-3">
+            <div class="form-group">
+              <label class="form-label">Predictive Model</label>
+              <select id="forecast-model-select" class="form-select">
+                <option value="physics_informed_lstm">Physics-Informed LSTM (PI-LSTM)</option>
+                <option value="conventional_lstm">Conventional LSTM</option>
+                <option value="random_forest">Random Forest Baseline</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lookback Window (Days)</label>
+              <input type="number" id="forecast-lookback-input" class="form-input" value="30" min="5" max="90">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Uncertainty Estimation</label>
+              <select class="form-select" disabled>
+                <option selected>Monte Carlo Dropout (90% Interval [Q05, Q95])</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forecast Performance Cards -->
+        <div class="grid-3" style="margin-bottom: 20px;">
+          <div class="stat-box">
+            <span class="stat-label">Model NSE</span>
+            <span id="forecast-metric-nse" class="stat-value cyan">0.892</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Model RMSE</span>
+            <span id="forecast-metric-rmse" class="stat-value amber">1.14 mm/d</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Model MAE</span>
+            <span id="forecast-metric-mae" class="stat-value emerald">0.72 mm/d</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Forecast Hydrograph &amp; Predictive Uncertainty</h2>
+              <div class="card-subtitle">Solid cyan line indicates predicted discharge; shaded envelope indicates 90% credible interval</div>
+            </div>
+          </div>
+          <div id="forecast-hydrograph-chart" class="chart-container tall"></div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PAGE 4: MODEL COMPARISON
+           =================================================================== -->
+      <section id="page-model-comparison" class="page-container">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Benchmark Model Performance Comparison</h2>
+              <div class="card-subtitle">All models evaluated on identical test period with identical meteorological forcing</div>
+            </div>
+          </div>
+          <div id="model-comparison-barchart" class="chart-container"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Scientific Performance Metrics Table</h2>
+          </div>
+          <div class="table-responsive">
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th>Model Architecture</th>
+                  <th>NSE (&uarr;)</th>
+                  <th>KGE (&uarr;)</th>
+                  <th>RMSE (mm/d &darr;)</th>
+                  <th>MAE (mm/d &darr;)</th>
+                  <th>PBIAS (%)</th>
+                  <th>Mean Mass Res (mm/d)</th>
+                  <th>PICP (90% Nom)</th>
+                  <th>Train Latency</th>
+                </tr>
+              </thead>
+              <tbody id="comparison-table-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PAGE 5: PHYSICS ANALYSIS
+           =================================================================== -->
+      <section id="page-physics-analysis" class="page-container">
+        <div class="research-banner">
+          <div class="research-banner-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          </div>
+          <div class="research-banner-content">
+            <h3>Catchment Water-Balance Equation: &Delta;S = P &minus; ET &minus; Q</h3>
+            <p>
+              Precipitation (<strong>P</strong>) enters the catchment; actual evapotranspiration (<strong>ET</strong>) and streamflow discharge (<strong>Q</strong>) exit.
+              Any difference accumulates in or depletes from the effective catchment storage (<strong>S</strong>).
+              Actual ET is rigorously bounded: <strong>0 &le; ET &le; PET</strong>. Specific runoff depth is converted from volumetric streamflow via
+              <strong>Q [mm/day] = 86.4 &times; Q [m³/s] / Area [km²]</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div class="stat-box">
+            <span class="stat-label">Mass Conservation Residual (Mean Absolute)</span>
+            <span id="wb-mean-res-value" class="stat-value emerald">0.08 mm/day</span>
+            <span class="stat-sub">Discrepancy R = P - ET - Q - &Delta;S</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Cumulative Mass Balance Closure Error</span>
+            <span id="wb-closure-value" class="stat-value cyan">0.00 mm</span>
+            <span class="stat-sub">Over complete 15-year record</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Coupled Flux Timeseries &amp; Storage Tracking</h2>
+              <div class="card-subtitle">Precipitation P, Potential ET, Constrained Actual ET, Runoff Q, and Mass Conservation Residual</div>
+            </div>
+          </div>
+          <div id="physics-water-balance-chart" class="chart-container tall"></div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PAGE 6: EXPERIMENTS & ABLATIONS
+           =================================================================== -->
+      <section id="page-experiments" class="page-container">
+        <!-- Live Job Tracker Card (Hidden by default, shown when job is active) -->
+        <div id="active-job-tracker" class="card" style="display: none; border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.06);">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Live Training Job: <code id="job-tracker-id">—</code></h2>
+              <div id="job-tracker-message" class="card-subtitle">Training model in background...</div>
+            </div>
+            <span id="job-tracker-status" class="badge badge-cyan">RUNNING</span>
+          </div>
+          <div class="progress-container">
+            <div id="job-tracker-progress-bar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 6px;">
+            <span id="job-tracker-loss">Loss: —</span>
+            <span>Non-blocking background thread worker</span>
+          </div>
+        </div>
+
+        <!-- Experiment Configuration Form -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Launch Scientific Experiment &amp; Ablation</h2>
+              <div class="card-subtitle">Configure data scarcity, noise injection, and physical loss weight &lambda;</div>
+            </div>
+            <button id="btn-launch-experiment" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Launch Training Experiment
+            </button>
+          </div>
+          <div class="grid-4">
+            <div class="form-group">
+              <label class="form-label">Catchment</label>
+              <select id="exp-catchment-select" class="form-select">
+                <option value="54057">54057 — Severn</option>
+                <option value="39001">39001 — Thames</option>
+                <option value="28009">28009 — Trent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Data Scarcity Proportion</label>
+              <select id="exp-scarcity-select" class="form-select">
+                <option value="1.0">100% (Full Record)</option>
+                <option value="0.5">50% Available Observations</option>
+                <option value="0.25">25% (Data-Sparse Basin)</option>
+                <option value="0.10">10% (Severely Ungauged)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Measurement Noise Level</label>
+              <select id="exp-noise-select" class="form-select">
+                <option value="0.0">0% (Clean Observations)</option>
+                <option value="0.10">10% Gaussian Noise</option>
+                <option value="0.20">20% Severe Sensor Noise</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Physics Weight &lambda;</label>
+              <input type="number" id="exp-lambda-input" class="form-input" value="0.1" step="0.05" min="0.0" max="2.0">
+            </div>
+          </div>
+          <div class="grid-4" style="margin-top: 10px;">
+            <div class="form-group">
+              <label class="form-label">Lookback Window (Days)</label>
+              <input type="number" id="exp-lookback-input" class="form-input" value="30" min="5" max="60">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Epochs</label>
+              <input type="number" id="exp-epochs-input" class="form-input" value="12" min="1" max="50">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Batch Size</label>
+              <input type="number" id="exp-batch-size-input" class="form-input" value="32" min="8" max="128">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hidden Dimension</label>
+              <input type="number" id="exp-hidden-dim-input" class="form-input" value="48" min="16" max="128">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Data Scarcity Ablation Curve</h2>
+              <div class="card-subtitle">PI-LSTM retains superior generalization under severe data scarcity (10% - 25%)</div>
+            </div>
+            <div id="scarcity-ablation-chart" class="chart-container"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Training Loss Trajectory</h2>
+              <div class="card-subtitle">Separate logging of Prediction Loss and Water-Balance Loss</div>
+            </div>
+            <div id="experiment-loss-chart" class="chart-container"></div>
+          </div>
+        </div>
+
+        <!-- Historical Experiments Table -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Experiment Run History &amp; CSV Artifacts</h2>
+          </div>
+          <div class="table-responsive">
+            <table class="styled-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Catchment</th>
+                  <th>Data %</th>
+                  <th>Noise %</th>
+                  <th>&lambda; Phys</th>
+                  <th>Status</th>
+                  <th>Export</th>
+                </tr>
+              </thead>
+              <tbody id="experiments-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           PAGE 7: ABOUT & METHODOLOGY
+           =================================================================== -->
+      <section id="page-about-methodology" class="page-container">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Scientific Theory: Physics-Informed Machine Learning (PIML)</h2>
+          </div>
+          <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7;">
+            <p style="margin-bottom: 14px;">
+              Hydrological rainfall-runoff modeling has traditionally relied either on conceptual, lumped bucket models
+              (such as HBV, PDM, GR4J) or pure data-driven deep learning models (such as conventional LSTM).
+              While deep neural networks achieve remarkable predictive accuracy, unconstrained data-driven models frequently
+              violate fundamental physical laws: generating negative runoff, creating or destroying water mass, and suffering
+              from catastrophic performance degradation when deployed on data-sparse basins or non-stationary regimes.
+            </p>
+            <p style="margin-bottom: 14px;">
+              <strong>HydroPhysics AI</strong> incorporates a continuous catchment mass-conservation inductive bias:
+            </p>
+            <div style="background: var(--bg-secondary); padding: 14px 18px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 16px;">
+              &Delta;S = P &minus; ET &minus; Q<br>
+              L_total = L_pred + &lambda;_physics &times; L_water_balance
+            </div>
+            <h3 style="color: var(--text-main); font-size: 1.0rem; margin: 16px 0 8px;">Key Physical Invariants Guaranteed</h3>
+            <ul style="margin-left: 20px; margin-bottom: 16px;">
+              <li><strong>Streamflow Non-Negativity:</strong> Q &ge; 0 is strictly enforced via Softplus non-linear activation.</li>
+              <li><strong>Actual Evapotranspiration Bound:</strong> 0 &le; ET &le; PET is enforced by scaling Potential Evapotranspiration by a Sigmoid fractional gate &alpha; &isin; (0, 1).</li>
+              <li><strong>Moisture Storage Non-Negativity:</strong> Catchment moisture store S &ge; 0 is enforced via Softplus.</li>
+              <li><strong>Dimensional Rigor:</strong> Q [mm/day] = 86.4 &times; Q [m³/s] / Area [km²]. Units are never conflated.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Dataset Provenance &amp; Citation</h2>
+            </div>
+            <div style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+              <p style="margin-bottom: 10px;">
+                <strong>Primary Benchmark:</strong> CAMELS-GB v2 (Catchment Attributes and MEteorology for Large-sample Studies &mdash; Great Britain).
+              </p>
+              <p style="margin-bottom: 10px;">
+                <strong>Citation:</strong> Coxon, G., Addor, N., Bloomfield, J. P., et al. (2020). CAMELS-GB: hydrometeorological assets for 671 catchments in Great Britain. <em>Earth System Science Data</em>, 12(4), 2459&ndash;2483.
+              </p>
+              <p>
+                <strong>Archive:</strong> Centre for Environmental Data Analysis (CEDA) Archive.<br>
+                <strong>Licence:</strong> Open Government Licence (OGL) v3.0.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Scientific Assumptions &amp; Limitations</h2>
+            </div>
+            <div style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6;">
+              <ul style="margin-left: 18px;">
+                <li>Closed Surface Watershed: Boundary groundwater inter-basin transfers are assumed negligible.</li>
+                <li>Discrete Daily Steps: Discrete Euler integration approximates continuous differential dS/dt.</li>
+                <li>Research Prototype: Designed for scientific evaluation and Master's ML portfolio; not an operational flood alert siren.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Application JS -->
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
