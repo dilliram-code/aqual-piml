@@ -30,7 +30,7 @@ class CatchmentSummary(BaseModel):
 class CatchmentDetailResponse(BaseModel):
     metadata: Dict[str, Any]
     data_summary: Dict[str, Any]
-    date_range: Dict[str, str]
+    date_range: Dict[str, Any]
     quality_flag_distribution: Dict[str, int]
 
 
